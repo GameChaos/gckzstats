@@ -5,7 +5,7 @@ var tpRun = 'false';
 
 console.log(document.location);
 
-$.getJSON('http://kztimerglobal.com/api/v1.0/records/top?tickrate=128&modes_list=' + mode + '&has_teleports=' + tpRun + '&limit=2', function(data)
+$.getJSON('https://kztimerglobal.com/api/v1.0/records/top?tickrate=128&modes_list=' + mode + '&has_teleports=' + tpRun + '&limit=2', function(data)
 {
 	$.each(data, function(index, value)
 	{
