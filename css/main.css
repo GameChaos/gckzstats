@@ -1,0 +1,39 @@
+#header
+{
+	margin: 0;
+	padding: 0.1% 2%;
+}
+
+#latestTimes
+{
+	padding: 5%;
+}
+
+.map-thumbnail-small
+{
+	width: 160px;
+	height: 90px;
+}
+
+a.hyperlink:link, a.hyperlink:visited, a.hyperlink:hover, a.hyperlink:active
+{
+	color: #28A745;
+}
+
+a.hyperlink:active
+{
+	text-decoration: none;
+}
+
+a.image-hyperlink:hover
+{
+	text-decoration: none;
+}
+
+footer
+{
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+}
