@@ -2,6 +2,7 @@ var maps = [''];
 
 var mode = 'kztimer';
 var tpRun = 'false';
+const unknownImage = 'images/unknown_map.png';
 
 console.log(document.location);
 
@@ -17,7 +18,13 @@ $.getJSON('https://kztimerglobal.com/api/v1.0/records/top?tickrate=128&modes_lis
 
 	maps.forEach(function(value, index)
 	{
-		imageExists('images/' + value.map_name + '.jpg');
+		var imgPath = 'images/' + value.map_name + '.jpg';
+		if (!imageExists(imgPath))
+		{
+			imgPath = unknownImage;
+		}
+		
+		latestTimesList.insertAdjacentHTML('afterEnd', '<li class="list-group-item bg-dark"><a href="#" class="image-hyperlink"><img src=' + imgPath + ' class="img-fluid map-thumbnail-small"></a><a href="#" class="hyperlink">' + value.map_name + '</a></li>');
 		console.log(index, value.time);
 	});
 });
@@ -31,11 +38,13 @@ function imageExists(path)
 		error: function()
 		{
 			console.log('file doesn\'t exist')
+			return false;
 			//file not exists
 		},
 		success: function()
 		{
 			console.log('file exists')
+			return true;
 			//file exists
 		}
 	});
