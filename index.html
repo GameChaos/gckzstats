@@ -21,7 +21,7 @@
 			<div class="collapse navbar-collapse" id="navbarSupportedContent">
 				<ul class="navbar-nav mr-auto">
 					<li class="nav-item active">
-						<a class="nav-link" href="index.html">Home<span class="sr-only">(current)</span></a>
+						<a class="nav-link" href="#">Home<span class="sr-only">(current)</span></a>
 					</li>
 					<li class="nav-item">
 						<a class="nav-link" href="#">Link</a>
@@ -53,14 +53,27 @@
 	<div class="container">
 		<div id="latestTimes">
 			<div class="card text-left text-white bg-dark mb-3">
-				<div class=" card-header">
+				<div class="card-header">
 					Latest times
+					<div style="float: right">
+						Run Type: 
+						<div class="dropdown" style="display: inline-block">
+							<button id="runtype-dropdown" class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
+								aria-haspopup="true" aria-expanded="false">
+								Pro
+							</button>
+							<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+								<a class="dropdown-item" href="#">Pro</a>
+								<a class="dropdown-item" href="#">TP</a>
+							</div>
+						</div>
+					</div>
 				</div>
 				<div class="card-body text-left">
 					<ul id="latestTimesList" class="list-group list-group-flush"></ul>
 				</div>
 				<div class="card-footer text-center">
-					2 days ago
+					Placeholder text
 				</div>
 			</div>
 		</div>
@@ -69,7 +82,7 @@
 			<footer class="footer">
 				<div class="card text-center text-white bg-dark">
 					<div class="card-body">
-						This is some text within a card body.
+						Footer placeholder text
 					</div>
 				</div>
 			</footer>

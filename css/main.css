@@ -9,6 +9,11 @@
 	padding: 5%;
 }
 
+#latestTimesList
+{
+	display: inline-block;
+}
+
 .map-thumbnail-small
 {
 	width: 160px;
