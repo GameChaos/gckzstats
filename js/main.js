@@ -31,7 +31,7 @@ $.getJSON('https://kztimerglobal.com/api/v1.0/records/top?tickrate=128&modes_lis
 
 function imageExists(path)
 {
-	$.ajax(
+	/*$.ajax(
 	{
 		url:path,
 		type:'HEAD',
@@ -47,5 +47,14 @@ function imageExists(path)
 			return true;
 			//file exists
 		}
-	});
+	});*/
+	$.get(path).done(function()
+	{ 
+		console.log('image exists');
+		return true;
+	}).fail(function()
+	{ 
+		console.log('image doesn\'t exist');
+		return false;
+    })
 }
