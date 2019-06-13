@@ -1,13 +1,22 @@
-
+// style stuff
+const bgColour = 'bg-dark';
 
 var mode = 'kz_timer';
 var runType = ['Pro', 'TP'];
 var tpRun = 'false';
+
+// how many times per page on latest times
+const latestTimesCount = 6;
+const latestTimesPageCount = 16;
 const imgMissingMap = 'images/unknown_map.png';
 
-function LoadLatestTimes()
+// current page on latestTimes
+var latestTimesCurrentPage = 0;
+
+function updateLatestTimes()
 {
-	$.getJSON('https://kztimerglobal.com/api/v1.0/records/top/recent?has_teleports=' + tpRun + '&tickrate=128&stage=0&modes_list_string=' + mode + '&place_top_at_least=1&limit=6', function (data)
+	var offset = latestTimesCurrentPage * latestTimesCount;
+	$.getJSON('https://kztimerglobal.com/api/v1.0/records/top/recent?has_teleports=' + tpRun + '&tickrate=128&stage=0&modes_list_string=' + mode + '&place_top_at_least=1&offset=' + offset + '&limit=6', function (data)
 	{
 		var maps = [];
 		$.each(data, function (index, value)
@@ -22,13 +31,12 @@ function LoadLatestTimes()
 		{
 			var imgPath = 'images/' + value.map_name + '.jpg';
 			$('#latestTimesList').append('\
-			<li class="list-group-item bg-dark">\
-				<a href="#" class="image-hyperlink">\
+			<li class="list-group-item ' + bgColour + '">\
+				<a href="index.html/maps/' + value.map_name + '" class="image-hyperlink map-link">\
 					<img src="' + imgPath + '" class="img-fluid map-thumbnail-small" onerror="onImgError(this)">\
 				</a>\
 				<p style="display: inline-block">\
-					<a href="#" class="hyperlink">' + value.map_name + '</a>\
-					(' + formatTime(value.time) + ')<br>\
+					<a href="#" class="hyperlink map-link">' + value.map_name + '</a> (' + formatTime(value.time) + ')<br>\
 					by <a href="#" class="hyperlink">' + value.player_name + '</a>\
 				</p>\
 			</li>');
@@ -38,26 +46,31 @@ function LoadLatestTimes()
 
 function removeAllChildrenFromNode(node)
 {
-	/*var shell;
-	// do not copy the contents
-	shell = node.cloneNode(false);
-  
-	if (node.parentNode)
-	{
-		node.parentNode.replaceChild(shell, node);
-	}
-  
-	return shell;*/
 	while (node.lastChild)
 	{
 		node.removeChild(node.lastChild);
 	}
 	return node;
-  }
+}
 
-LoadLatestTimes();
+updateLatestTimes();
 
-$(".dropdown-menu a").click(function()
+$('#latestTimesPageButtons').twbsPagination({
+	totalPages: latestTimesPageCount,
+	visiblePages: 3,
+	onPageClick: function (event, page)
+	{
+		latestTimesCurrentPage = page - 1;
+		updateLatestTimes();
+	}
+});
+// var mapLink = document.getElementsByClassName('map-name');
+$("a").click(function()
+{
+	console.log('clicked map link');
+});
+
+$("#tpRun-dropdown a.dropdown-item").click(function()
 {
 	$("#runtype-dropdown").html($(this).text());
 
@@ -66,16 +79,13 @@ $(".dropdown-menu a").click(function()
 		if (tpRun != 'true')
 		{
 			tpRun = 'true';
-			LoadLatestTimes();
+			updateLatestTimes();
 		}
 	}
-	else
+	else if (tpRun != 'false')
 	{
-		if (tpRun != 'false')
-		{
-			tpRun = 'false';
-			LoadLatestTimes();
-		}
+		tpRun = 'false';
+		updateLatestTimes();
 	}
 });
 
