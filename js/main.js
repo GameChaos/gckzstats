@@ -120,7 +120,7 @@ function updateLatestTimes()
 
 		var latestTimesList = document.getElementById("latestTimesList");
 		latestTimesList = removeAllChildrenFromNode(latestTimesList);
-
+		
 		maps.forEach(function (value, index)
 		{
 			var imgPath = 'images/' + value.map_name + '.jpg';
