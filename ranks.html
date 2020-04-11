@@ -145,8 +145,6 @@ function UpdateRanks()
 		var multiplier = Math.min(1, Math.pow(parseFloat(data[0].finishes), base) / Math.pow(filterCount, base));
 		var skill = parseFloat(data[0].average) * multiplier
 		
-		console.log(multiplier);
-		
 		$('#ranks').append('\
 		<li class="list-group-item ">\
 			<p>\
@@ -159,8 +157,6 @@ function UpdateRanks()
 				Finishes: ' + data[0].finishes + '<br>\
 			</p>\
 		</li>');
-		
-		console.log("Updated total ranks.")
 	});
 }
 
@@ -191,7 +187,6 @@ function CacheRecordFilters()
 			recordFilters[GetModeName(value.mode_id)][value.has_teleports].push(value);
 		})
 		
-		//console.log(recordFilters);
 		OnRecordFiltersCached();
 	});
 }
