@@ -104,7 +104,7 @@ function UpdateMaxPoints()
 		return;
 	}
 	
-	$.getJSON('https://kztimerglobal.com/api/v1.0/player_ranks?' + GetRecordFilterIDString() + 'stages=0&mode_ids=' + GetModeID(GetRunMode()) + '&has_teleports=' + GetRunType() + '&limit=1', function (data)
+	$.getJSON('https://kztimerglobal.com/api/v1.0/player_ranks?stages=0&mode_ids=' + GetModeID(GetRunMode()) + '&has_teleports=' + GetRunType() + '&limit=1', function (data)
 	{
 		maxPoints[GetRunMode()][GetRunType()] = data[0].points;
 		OnMaxPointsUpdated();
@@ -229,20 +229,6 @@ function CacheRecordFilters()
 		
 		OnRecordFiltersCached();
 	});
-}
-
-function GetRecordFilterIDString(parameterName)
-{
-	filterString = "";
-	
-	for (let i = 0; i < recordFilters[GetRunMode()][GetRunType()].length; i++)
-	{
-		filterString += 'record_filter_ids=' + recordFilters[GetRunMode()][GetRunType()][i].id + '&';
-	}
-	
-	//console.log(recordFilters[GetRunMode()][GetRunType()][0])
-	
-	return filterString;
 }
 
 function GetRunType()
