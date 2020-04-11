@@ -93,7 +93,7 @@ function OnMapsCached()
 
 function UpdateMaxPoints()
 {
-	$.getJSON('http://kztimerglobal.com/api/v1.0/player_ranks?stages=0&mode_ids=' + GetModeID(GetRunMode()) + '&has_teleports=' + GetRunType() + '&limit=1', function (data)
+	$.getJSON('https://kztimerglobal.com/api/v1.0/player_ranks?stages=0&mode_ids=' + GetModeID(GetRunMode()) + '&has_teleports=' + GetRunType() + '&limit=1', function (data)
 	{
 		maxPoints = data[0].points;
 		OnMaxPointsUpdated();
@@ -136,7 +136,7 @@ function UpdateRanks()
 		return;
 	}
 	
-	$.getJSON('http://kztimerglobal.com/api/v1.0/player_ranks?steamid64s=' + steamID + '&stages=0&mode_ids=' + GetModeID(GetRunMode()) + '&has_teleports=' + GetRunType() + '&limit=1', function (data)
+	$.getJSON('https://kztimerglobal.com/api/v1.0/player_ranks?steamid64s=' + steamID + '&stages=0&mode_ids=' + GetModeID(GetRunMode()) + '&has_teleports=' + GetRunType() + '&limit=1', function (data)
 	{
 		removeAllChildrenFromNode(document.getElementById("ranks"));
 		
@@ -162,7 +162,7 @@ function UpdateRanks()
 
 function CacheMaps()
 {
-	$.getJSON('http://kztimerglobal.com/api/v1.0/maps?is_validated=true', function (data)
+	$.getJSON('https://kztimerglobal.com/api/v1.0/maps?is_validated=true', function (data)
 	{
 		$.each(data, function (index, value)
 		{
@@ -174,7 +174,7 @@ function CacheMaps()
 
 function CacheRecordFilters()
 {
-	$.getJSON('http://kztimerglobal.com/api/v1.0/record_filters?stages=0&limit=10000&tickrates=128', function (data)
+	$.getJSON('https://kztimerglobal.com/api/v1.0/record_filters?stages=0&limit=10000&tickrates=128', function (data)
 	{
 		recordFilters = {
 			"kz_timer": {"true": [], "false": []}, // ture is TP, false is Pro
