@@ -158,8 +158,7 @@ function UpdateRankTop()
 					Rank: ' + GetRankFromPoints(data[index].points) + '<br>\
 					Points: ' + data[index].points + '<br>\
 					Skill Level: ' + GetSkillFromPoints(skill) + '<br>\
-					Original Skill Points: ' + data[index].average + '<br>\
-					Adjusted Skill Points: ' + skill + '<br>\
+					Adjusted Skill Points: ' + Math.round(skill) + '<br>\
 					Finishes: ' + data[index].finishes + '<br>\
 				</p>\
 			</li>');
@@ -192,8 +191,7 @@ function UpdateRanks()
 				Rank: ' + GetRankFromPoints(data[0].points) + '<br>\
 				Points: ' + data[0].points + '<br>\
 				Skill Level: ' + GetSkillFromPoints(skill) + '<br>\
-				Original Skill Points: ' + data[0].average + '<br>\
-				Adjusted Skill Points: ' + skill + '<br>\
+				Adjusted Skill Points: ' + Math.round(skill) + '<br>\
 				Finishes: ' + data[0].finishes + '<br>\
 			</p>\
 		</li>');
