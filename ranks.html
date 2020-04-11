@@ -33,7 +33,10 @@
 <p id="totalRankTiers"></p>
 <h3>Skill Points</h3>
 <p id="avgRankTiers"></p>
+<h3>Player Profile</h3>
 <ul id="ranks"></ul>
+<h3>Leaderboard</h3>
+<ul id="rankTop"></ul>
 
 <!-- SCRIPTS -->
 
@@ -69,7 +72,6 @@ var rankPoints = [];
 var skillPoints = [];
 
 //CacheMaps();
-UpdateMaxPoints();
 CacheRecordFilters();
 
 function OnInfoUpdated()
@@ -82,11 +84,12 @@ function OnMaxPointsUpdated()
 	UpdateTotalRankTiers();
 	UpdateAvgRankTiers();
 	UpdateRanks();
+	UpdateRankTop();
 }
 
 function OnRecordFiltersCached()
 {
-	//UpdateMaxPoints();
+	UpdateMaxPoints();
 }
 
 function OnMapsCached()
@@ -101,7 +104,7 @@ function UpdateMaxPoints()
 		return;
 	}
 	
-	$.getJSON('https://kztimerglobal.com/api/v1.0/player_ranks?stages=0&mode_ids=' + GetModeID(GetRunMode()) + '&has_teleports=' + GetRunType() + '&limit=1', function (data)
+	$.getJSON('https://kztimerglobal.com/api/v1.0/player_ranks?' + GetRecordFilterIDString() + 'stages=0&mode_ids=' + GetModeID(GetRunMode()) + '&has_teleports=' + GetRunType() + '&limit=1', function (data)
 	{
 		maxPoints[GetRunMode()][GetRunType()] = data[0].points;
 		OnMaxPointsUpdated();
@@ -133,6 +136,35 @@ function UpdateAvgRankTiers()
 		skillPoints[rank] = Math.round((rank) / (rankNames.length) * 1000);
 		$('#avgRankTiers').append(skillPoints[rank - 1] + 1 + ' - ' + skillPoints[rank] + ' ' + rankNames[rank - 1] + '<br>');
 	}
+}
+
+function UpdateRankTop()
+{
+	$.getJSON('https://kztimerglobal.com/api/v1.0/player_ranks?stages=0&mode_ids=' + GetModeID(GetRunMode()) + '&has_teleports=' + GetRunType() + '&limit=10', function (data)
+	{
+		removeAllChildrenFromNode(document.getElementById("rankTop"));
+		
+		var base = 0.2;
+		var filterCount = recordFilters[GetRunMode()][GetRunType()].length;
+		$.each(data, function (index, value)
+		{
+			var multiplier = Math.min(1, Math.pow(parseFloat(data[index].finishes), base) / Math.pow(filterCount, base));
+			var skill = parseFloat(data[index].average) * multiplier
+			
+			$('#rankTop').append('\
+			<li class="list-group-item ">\
+				<p>\
+					Name: ' + data[index].player_name + '<br>\
+					Rank: ' + GetRankFromPoints(data[index].points) + '<br>\
+					Points: ' + data[index].points + '<br>\
+					Skill Level: ' + GetSkillFromPoints(skill) + '<br>\
+					Original Skill Points: ' + data[index].average + '<br>\
+					Adjusted Skill Points: ' + skill + '<br>\
+					Finishes: ' + data[index].finishes + '<br>\
+				</p>\
+			</li>');
+		});
+	});
 }
 
 function UpdateRanks()
@@ -197,6 +229,20 @@ function CacheRecordFilters()
 		
 		OnRecordFiltersCached();
 	});
+}
+
+function GetRecordFilterIDString(parameterName)
+{
+	filterString = "";
+	
+	for (let i = 0; i < recordFilters[GetRunMode()][GetRunType()].length; i++)
+	{
+		filterString += 'record_filter_ids=' + recordFilters[GetRunMode()][GetRunType()][i].id + '&';
+	}
+	
+	//console.log(recordFilters[GetRunMode()][GetRunType()][0])
+	
+	return filterString;
 }
 
 function GetRunType()
@@ -295,6 +341,7 @@ function GetRankFromPoints(points)
 			return rankNames[rank - 1];
 		}
 	}
+	return rankNames[rankNames.length - 1];
 }
 
 function GetSkillFromPoints(points)
