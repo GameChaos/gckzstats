@@ -140,7 +140,7 @@ function UpdateAvgRankTiers()
 
 function UpdateRankTop()
 {
-	$.getJSON('https://kztimerglobal.com/api/v1.0/player_ranks?stages=0&mode_ids=' + GetModeID(GetRunMode()) + '&has_teleports=' + GetRunType() + '&limit=1', function (data)
+	$.getJSON('https://kztimerglobal.com/api/v1.0/player_ranks?stages=0&mode_ids=' + GetModeID(GetRunMode()) + '&has_teleports=' + GetRunType() + '&limit=10', function (data)
 	{
 		removeAllChildrenFromNode(document.getElementById("rankTop"));
 		
