@@ -24,7 +24,7 @@
 
 <form>
 	Steam ID:
-	<input type="text" id="steamIDInput" onchange="OnInfoUpdated()">
+	<input type="text" id="steamIDInput" placeholder="STEAM_1:X:XXXXXXXXX" onchange="OnInfoUpdated()">
 </form>
 
 <h3>Rank Points</h3>
@@ -55,34 +55,64 @@ integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="ano
 var STEAM_BASELINE = '76561197960265728';
 var maps = [];
 var recordFilters = {};
+var maxPoints = 0;
 var mode = 'kz_timer';
 var runType = ['Pro', 'TP'];
 var tpRun = 'false';
 var offset = 0;
-var rankNames = ['Unranked', 'New', 'Scrub', 'Beginner', 'Trainee', 'Casual', 'Regular', 'Skilled', 'Expert', 'Semi-Pro', 'Pro', 'Hardcore', 'Master', 'Elite', 'God']
+// good names
+// ['New', 'Rookie', 'Beginner', 'Trainee', 'Casual', 'Regular', 'Intermediate', 'Skilled', 'Expert', 'Semi-Pro', 'Pro', 'Hardcore', 'Elite', 'Master', 'God']
+var rankNames = ['Novice', 'Rookie', 'Beginner', 'Trainee', 'Casual', 'Regular', 'Intermediate', 'Skilled', 'Expert', 'Semi-Pro', 'Pro', 'Master', 'Elite']
 var rankPoints = [];
 var skillPoints = [];
 
 //CacheMaps();
+UpdateMaxPoints();
 CacheRecordFilters();
-UpdateRanks();
+
+function OnInfoUpdated()
+{
+	UpdateMaxPoints();
+}
+
+function OnMaxPointsUpdated()
+{
+	UpdateTotalRankTiers();
+	UpdateAvgRankTiers();
+	UpdateRanks();
+}
+
+function OnRecordFiltersCached()
+{
+	//UpdateMaxPoints();
+}
+
+function OnMapsCached()
+{
+}
+
+function UpdateMaxPoints()
+{
+	$.getJSON('http://kztimerglobal.com/api/v1.0/player_ranks?stages=0&mode_ids=' + GetModeID(GetRunMode()) + '&has_teleports=' + GetRunType() + '&limit=1', function (data)
+	{
+		maxPoints = data[0].points;
+		OnMaxPointsUpdated();
+	});
+}
 
 function UpdateTotalRankTiers()
 {
 	removeAllChildrenFromNode(document.getElementById("totalRankTiers"));
 	
-	var base = 2;
+	var base = 3;
 	
 	rankPoints[0] = 0;
-	var filterCount = recordFilters[GetRunMode()][GetRunType()].length;
 	
 	for (let rank = 1; rank <= rankNames.length; rank++)
 	{
-		rankPoints[rank] = Math.round(Math.pow(rank, base) / Math.pow(rankNames.length, base) * filterCount * 1000);
+		rankPoints[rank] = Math.round(Math.pow(rank, base) / Math.pow(rankNames.length, base) * maxPoints);
 		$('#totalRankTiers').append(rankPoints[rank - 1] + 1 + ' - ' + rankPoints[rank] + ' ' + rankNames[rank - 1] + '<br>');
 	}
-	
-	console.log(rankPoints);
 }
 
 function UpdateAvgRankTiers()
@@ -95,8 +125,6 @@ function UpdateAvgRankTiers()
 		skillPoints[rank] = Math.round((rank) / (rankNames.length) * 1000);
 		$('#avgRankTiers').append(skillPoints[rank - 1] + 1 + ' - ' + skillPoints[rank] + ' ' + rankNames[rank - 1] + '<br>');
 	}
-	
-	console.log("Map count:", maps.length);
 }
 
 function UpdateRanks()
@@ -112,39 +140,28 @@ function UpdateRanks()
 	{
 		removeAllChildrenFromNode(document.getElementById("ranks"));
 		
+		var base = 0.2;
+		var filterCount = recordFilters[GetRunMode()][GetRunType()].length;
+		var multiplier = Math.min(1, Math.pow(parseFloat(data[0].finishes), base) / Math.pow(filterCount, base));
+		var skill = parseFloat(data[0].average) * multiplier
+		
+		console.log(multiplier);
+		
 		$('#ranks').append('\
 		<li class="list-group-item ">\
 			<p>\
 				Name: ' + data[0].player_name + '<br>\
 				Rank: ' + GetRankFromPoints(data[0].points) + '<br>\
 				Points: ' + data[0].points + '<br>\
-				Skill Level: ' + GetSkillFromPoints(data[0].average) + '<br>\
-				Skill Points: ' + data[0].average + '<br>\
-				Rating: ' + data[0].rating + '<br>\
+				Skill Level: ' + GetSkillFromPoints(skill) + '<br>\
+				Original Skill Points: ' + data[0].average + '<br>\
+				Adjusted Skill Points: ' + skill + '<br>\
 				Finishes: ' + data[0].finishes + '<br>\
 			</p>\
 		</li>');
-		console.log(data)
 		
 		console.log("Updated total ranks.")
 	});
-}
-
-function OnInfoUpdated()
-{
-	UpdateTotalRankTiers();
-	UpdateAvgRankTiers();
-	UpdateRanks();
-}
-
-function OnRecordFiltersCached()
-{
-	UpdateTotalRankTiers();
-	UpdateAvgRankTiers();
-}
-
-function OnMapsCached()
-{
 }
 
 function CacheMaps()
@@ -174,7 +191,7 @@ function CacheRecordFilters()
 			recordFilters[GetModeName(value.mode_id)][value.has_teleports].push(value);
 		})
 		
-		console.log(recordFilters);
+		//console.log(recordFilters);
 		OnRecordFiltersCached();
 	});
 }
