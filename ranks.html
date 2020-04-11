@@ -11,12 +11,12 @@
 
 <body style="background: #aaa;">
 
-<select id="tpRun-dropdown" name="TP/Pro" onchange="OnInfoUpdated()">
+<select id="tpRun-dropdown" name="TP/Pro">
 	<option value="true">TP</option>
 	<option value="false">Pro</option>
 </select>
 
-<select id="mode-dropdown" name="Mode" onchange="OnInfoUpdated()">
+<select id="mode-dropdown" name="Mode"">
 	<option value="kz_timer">KZTimer</option>
 	<option value="kz_simple">SimpleKZ</option>
 	<option value="kz_vanilla">Vanilla</option>
@@ -24,8 +24,10 @@
 
 <form>
 	Steam ID:
-	<input type="text" id="steamIDInput" placeholder="STEAM_1:X:XXXXXXXXX" onchange="OnInfoUpdated()">
+	<input type="text" id="steamIDInput" placeholder="STEAM_1:X:XXXXXXXXX">
 </form>
+
+<button type="button" onclick="OnInfoUpdated()"">Update</button>
 
 <h3>Rank Points</h3>
 <p id="totalRankTiers"></p>
@@ -55,14 +57,14 @@ integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="ano
 var STEAM_BASELINE = '76561197960265728';
 var maps = [];
 var recordFilters = {};
-var maxPoints = 0;
+var maxPoints = {"kz_timer": {}, "kz_simple": {}, "kz_vanilla": {}}; // tp, pro
 var mode = 'kz_timer';
 var runType = ['Pro', 'TP'];
 var tpRun = 'false';
 var offset = 0;
 // good names
 // ['New', 'Rookie', 'Beginner', 'Trainee', 'Casual', 'Regular', 'Intermediate', 'Skilled', 'Expert', 'Semi-Pro', 'Pro', 'Hardcore', 'Elite', 'Master', 'God']
-var rankNames = ['Novice', 'Rookie', 'Beginner', 'Trainee', 'Casual', 'Regular', 'Intermediate', 'Skilled', 'Expert', 'Semi-Pro', 'Pro', 'Master', 'Elite']
+var rankNames = ['Novice', 'Rookie', 'Beginner', 'Trainee', 'Casual', 'Regular', 'Intermediate', 'Skilled', 'Expert', 'Semi-Pro', 'Pro', 'Elite', 'Master']
 var rankPoints = [];
 var skillPoints = [];
 
@@ -93,9 +95,15 @@ function OnMapsCached()
 
 function UpdateMaxPoints()
 {
+	if (GetRunType() in maxPoints[GetRunMode()])
+	{
+		OnMaxPointsUpdated();
+		return;
+	}
+	
 	$.getJSON('https://kztimerglobal.com/api/v1.0/player_ranks?stages=0&mode_ids=' + GetModeID(GetRunMode()) + '&has_teleports=' + GetRunType() + '&limit=1', function (data)
 	{
-		maxPoints = data[0].points;
+		maxPoints[GetRunMode()][GetRunType()] = data[0].points;
 		OnMaxPointsUpdated();
 	});
 }
@@ -110,7 +118,7 @@ function UpdateTotalRankTiers()
 	
 	for (let rank = 1; rank <= rankNames.length; rank++)
 	{
-		rankPoints[rank] = Math.round(Math.pow(rank, base) / Math.pow(rankNames.length, base) * maxPoints);
+		rankPoints[rank] = Math.round(Math.pow(rank, base) / Math.pow(rankNames.length, base) * maxPoints[GetRunMode()][GetRunType()]);
 		$('#totalRankTiers').append(rankPoints[rank - 1] + 1 + ' - ' + rankPoints[rank] + ' ' + rankNames[rank - 1] + '<br>');
 	}
 }
