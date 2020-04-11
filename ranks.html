@@ -9,23 +9,30 @@
 		integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />-->
 </head>
 
-<body style="background: #555;">
+<body style="background: #aaa;">
 
-<select id="tpRun-dropdown" name="TP/Pro" onchange="UpdateRanks()">
+<select id="tpRun-dropdown" name="TP/Pro" onchange="OnInfoUpdated()">
 	<option value="true">TP</option>
 	<option value="false">Pro</option>
 </select>
 
-<select id="mode-dropdown" name="Mode" onchange="UpdateRanks()">
+<select id="mode-dropdown" name="Mode" onchange="OnInfoUpdated()">
 	<option value="kz_timer">KZTimer</option>
 	<option value="kz_simple">SimpleKZ</option>
 	<option value="kz_vanilla">Vanilla</option>
 </select>
 
-<input type="text" id="steamIDInput" onchange="UpdateRanks()">
+<form>
+	Steam ID:
+	<input type="text" id="steamIDInput" onchange="OnInfoUpdated()">
+</form>
 
-<ul id="rankTiers"></ul>
-<ul id="latestTimesList"></ul>
+<h3>Rank Points</h3>
+<p id="totalRankTiers"></p>
+<h3>Skill Points</h3>
+<p id="avgRankTiers"></p>
+<ul id="ranks"></ul>
+
 <!-- SCRIPTS -->
 
 <!--<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
@@ -40,23 +47,137 @@ crossorigin="anonymous"></script>-->
 
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"
 integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-<script src="https://peterolson.github.io/BigInteger.js/BigInteger.min.js"></script>
+<script src="js/lib/impl/array.js"></script>
 <!--<script src="js/jquery.twbsPagination.min.js"></script>-->
 
 <script>
 
-var BigInteger = require("big-integer");
-
+var STEAM_BASELINE = '76561197960265728';
 var maps = [];
+var recordFilters = {};
 var mode = 'kz_timer';
 var runType = ['Pro', 'TP'];
 var tpRun = 'false';
 var offset = 0;
 var rankNames = ['Unranked', 'New', 'Scrub', 'Beginner', 'Trainee', 'Casual', 'Regular', 'Skilled', 'Expert', 'Semi-Pro', 'Pro', 'Hardcore', 'Master', 'Elite', 'God']
+var rankPoints = [];
+var skillPoints = [];
 
 //CacheMaps();
-//UpdateRanks();
-console.log(SteamIDTo64('STEAM_1:0:102468802'));
+CacheRecordFilters();
+UpdateRanks();
+
+function UpdateTotalRankTiers()
+{
+	removeAllChildrenFromNode(document.getElementById("totalRankTiers"));
+	
+	var base = 2;
+	
+	rankPoints[0] = 0;
+	var filterCount = recordFilters[GetRunMode()][GetRunType()].length;
+	
+	for (let rank = 1; rank <= rankNames.length; rank++)
+	{
+		rankPoints[rank] = Math.round(Math.pow(rank, base) / Math.pow(rankNames.length, base) * filterCount * 1000);
+		$('#totalRankTiers').append(rankPoints[rank - 1] + 1 + ' - ' + rankPoints[rank] + ' ' + rankNames[rank - 1] + '<br>');
+	}
+	
+	console.log(rankPoints);
+}
+
+function UpdateAvgRankTiers()
+{
+	removeAllChildrenFromNode(document.getElementById("avgRankTiers"));
+	
+	skillPoints[0] = 0;
+	for (let rank = 1; rank <= rankNames.length; rank++)
+	{
+		skillPoints[rank] = Math.round((rank) / (rankNames.length) * 1000);
+		$('#avgRankTiers').append(skillPoints[rank - 1] + 1 + ' - ' + skillPoints[rank] + ' ' + rankNames[rank - 1] + '<br>');
+	}
+	
+	console.log("Map count:", maps.length);
+}
+
+function UpdateRanks()
+{
+	var steamID = SteamIDTo64(GetSteamID());
+	
+	if (steamID == 'unknown')
+	{
+		return;
+	}
+	
+	$.getJSON('http://kztimerglobal.com/api/v1.0/player_ranks?steamid64s=' + steamID + '&stages=0&mode_ids=' + GetModeID(GetRunMode()) + '&has_teleports=' + GetRunType() + '&limit=1', function (data)
+	{
+		removeAllChildrenFromNode(document.getElementById("ranks"));
+		
+		$('#ranks').append('\
+		<li class="list-group-item ">\
+			<p>\
+				Name: ' + data[0].player_name + '<br>\
+				Rank: ' + GetRankFromPoints(data[0].points) + '<br>\
+				Points: ' + data[0].points + '<br>\
+				Skill Level: ' + GetSkillFromPoints(data[0].average) + '<br>\
+				Skill Points: ' + data[0].average + '<br>\
+				Rating: ' + data[0].rating + '<br>\
+				Finishes: ' + data[0].finishes + '<br>\
+			</p>\
+		</li>');
+		console.log(data)
+		
+		console.log("Updated total ranks.")
+	});
+}
+
+function OnInfoUpdated()
+{
+	UpdateTotalRankTiers();
+	UpdateAvgRankTiers();
+	UpdateRanks();
+}
+
+function OnRecordFiltersCached()
+{
+	UpdateTotalRankTiers();
+	UpdateAvgRankTiers();
+}
+
+function OnMapsCached()
+{
+}
+
+function CacheMaps()
+{
+	$.getJSON('http://kztimerglobal.com/api/v1.0/maps?is_validated=true', function (data)
+	{
+		$.each(data, function (index, value)
+		{
+			maps[index] = value;
+		})
+		OnMapsCached();
+	});
+}
+
+function CacheRecordFilters()
+{
+	$.getJSON('http://kztimerglobal.com/api/v1.0/record_filters?stages=0&limit=10000&tickrates=128', function (data)
+	{
+		recordFilters = {
+			"kz_timer": {"true": [], "false": []}, // ture is TP, false is Pro
+			"kz_simple": {"true": [], "false": []},
+			"kz_vanilla": {"true": [], "false": []}
+		}
+		
+		$.each(data, function (index, value)
+		{
+			recordFilters[GetModeName(value.mode_id)][value.has_teleports].push(value);
+		})
+		
+		console.log(recordFilters);
+		OnRecordFiltersCached();
+	});
+}
 
 function GetRunType()
 {
@@ -104,42 +225,72 @@ function SteamIDTo64(inputID)
 	return output;
 }
 
-function steamID64toSteamID32 (steamID64) {
-	return Number(steamID64.substr(-16,16)) - 6561197960265728
-}
-
 function GetModeID(modeString)
 {
 	switch (modeString) {
-		case "kz_vanilla":
-			return 202
+		case "kz_timer":
+			return 200;
 			break;
 		case "kz_simple":
-			return 201
+			return 201;
+			break;
+		case "kz_vanilla":
+			return 202;
 			break;
 		default:
-			return 200
+			return -1;
 			break;
 	}
 }
 
-function RankTiers()
+function GetModeName(modeID)
 {
-	var rankTiers = document.getElementById("rankTiers");
-	rankTiers = removeAllChildrenFromNode(rankTiers);
-	
-	var base = 1.5;
-	for (let rank = 0; rank < rankNames.length; rank++)
+	switch (modeID) {
+		case 200:
+			return "kz_timer";
+			break;
+		case 201:
+			return "kz_simple";
+			break;
+		case 202:
+			return "kz_vanilla";
+			break;
+		default:
+			return -1;
+			break;
+	}
+}
+
+function GetRankFromPoints(points)
+{
+	if (rankPoints.length == 0)
 	{
-		$('#rankTiers').append('\
-		<li class="list-group-item ">\
-			<p>\
-				' + Math.pow(base, rank) / Math.pow(base, rankNames.length - 1) * maps.length * 1000 + ' ' + rankNames[rank] + '\
-			</p>\
-		</li>');
+		return rankNames[0];
 	}
 	
-	console.log("Map count:", maps.length);
+	for (let rank = 1; rank < rankNames.length; rank++)
+	{
+		if (points < rankPoints[rank])
+		{
+			return rankNames[rank - 1];
+		}
+	}
+}
+
+function GetSkillFromPoints(points)
+{
+	if (skillPoints.length == 0)
+	{
+		return rankNames[0];
+	}
+	
+	for (let skill = 1; skill < skillPoints.length; skill++)
+	{
+		if (points < skillPoints[skill])
+		{
+			return rankNames[skill - 1];
+		}
+	}
 }
 
 function formatTime(fTime)
@@ -182,38 +333,6 @@ function removeAllChildrenFromNode(node)
 	}
 	return node;
 }
-
-function UpdateRanks()
-{
-	$.getJSON('http://kztimerglobal.com/api/v1.0/player_ranks?stages=0&mode_ids=' + GetModeID(GetRunMode()) + '&has_teleports=' + GetRunType() + '&limit=1', function (data)
-	{
-		$.each(data, function (index, value)
-		{
-			console.log(value)
-		})
-		
-		console.log("Updated ranks.")
-	});
-}
-
-function CacheMaps()
-{
-	$.getJSON('http://kztimerglobal.com/api/v1.0/maps?is_validated=true', function (data)
-	{
-		$.each(data, function (index, value)
-		{
-			maps[index] = value;
-		})
-		OnMapsCached();
-	});
-}
-
-function OnMapsCached()
-{
-	RankTiers();
-}
-
-
 
 </script>
 </body>
