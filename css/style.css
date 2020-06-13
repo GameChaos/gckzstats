@@ -1,0 +1,22 @@
+body
+{
+	background: #aaa;
+	padding: 0px 25% 0px 25%;
+}
+
+table, th, td
+{
+	border: 1px solid #888888;
+	border-collapse: collapse;
+}
+
+th, td
+{
+	padding: 3px 15px 3px 5px;
+	border-collapse: collapse;
+}
+
+th
+{
+	text-align: left;
+}
