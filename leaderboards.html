@@ -1,0 +1,189 @@
+<!doctype html>
+
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script src="js/helpers.js"></script>
+
+<style>
+table, th, td
+{
+	border: 1px solid #888888;
+	border-collapse: collapse;
+}
+
+th, td
+{
+	padding: 3px 15px 3px 5px;
+	border-collapse: collapse;
+}
+th
+{
+	text-align: left;
+}
+</style>
+
+<head>
+	<title>GCKZStats</title>
+	<!--<link rel="stylesheet" href="css/main.css" />-->
+	<!--<link href="css/main.css" rel="stylesheet" type="text/css" />-->
+	<!--<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+		integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />-->
+</head>
+
+<body style="background: #aaa;padding: 0px 25% 0px 25%;">
+	
+<select onchange="OnTPRunDropdownChanged()" id="tpRun-dropdown" name="TP/Pro">
+	<option value="true">TP</option>
+	<option value="false">Pro</option>
+</select>
+
+<select onchange="OnModeDropdownChanged()" id="mode-dropdown" name="Mode">
+	<option value="kz_timer">KZTimer</option>
+	<option value="kz_simple">SimpleKZ</option>
+	<option value="kz_vanilla">Vanilla</option>
+</select>
+
+<h3 id="leaderboard-title">Top Players for MODE TPORPRO</h3>
+
+<div style="padding:0px 1% 0px 1%; float: left">
+	<h4>Point Leaderboard</h4>
+	<table id="leaderboard-points" style="width:75%;">
+		<tr>
+			<th>#</th>
+			<th>Player</th>
+			<th>Records</th>
+		</tr>
+	</table>
+</div>
+<div style="padding:0px 1% 0px 1%; float: left">
+	<h4>World Record Leaderboard</h4>
+	<table id="leaderboard-world-records" style="width:75%;">
+		<tr>
+			<th>#</th>
+			<th>Player</th>
+			<th>Records</th>
+		</tr>
+	</table>
+</div>
+
+
+</body>
+<script>
+
+OnPageOpened()
+function OnPageOpened()
+{
+	UpdateLeaderboardTitle()
+	UpdatePointLeaderboard()
+	UpdateWorldRecordLeaderboard()
+}
+
+function OnTPRunDropdownChanged()
+{
+	UpdateLeaderboardTitle()
+	UpdatePointLeaderboard()
+	UpdateWorldRecordLeaderboard()
+}
+
+function OnModeDropdownChanged()
+{
+	UpdateLeaderboardTitle()
+	UpdatePointLeaderboard()
+	UpdateWorldRecordLeaderboard()
+}
+
+function UpdateLeaderboardTitle()
+{
+	$('#leaderboard-title').text("Top Players for " + GetRunModePretty() + " " + GetRunTypePretty())
+}
+
+function UpdatePointLeaderboard()
+{
+	// http://kztimerglobal.com/api/v1.0/records/top/world_records?stages=0&mode_ids=200&has_teleports=false
+	RemoveAllChildrenFromNode(document.getElementById("leaderboard-points"));
+	$('#leaderboard-points').append('\
+	<tr>\
+		<th>#</th>\
+		<th>Player</th>\
+		<th>Total</th>\
+		<th>Average</th>\
+	</tr>');
+	// http://kztimerglobal.com/api/v1.0/player_ranks?stages=0&mode_ids=200&tickrates=128&has_teleports=false
+	$.getJSON('http://kztimerglobal.com/api/v1.0/player_ranks?stages=0&mode_ids=' + GetModeID(GetRunMode()) + '&tickrates=128&has_teleports=' + GetRunType(), function (data)
+	{
+		$.each(data, function (index, value)
+		{
+			$('#leaderboard-points').append('\
+			<tr>\
+				<td>' + (index + 1) + '</td>\
+				<td>' + data[index].player_name + '</td>\
+				<td>' + data[index].points.toLocaleString() + '</td>\
+				<td>' + data[index].average.toFixed(1) + '</td>\
+			</tr>');
+		});
+	});
+}
+
+function UpdateWorldRecordLeaderboard()
+{
+	// http://kztimerglobal.com/api/v1.0/records/top/world_records?stages=0&mode_ids=200&has_teleports=false
+	RemoveAllChildrenFromNode(document.getElementById("leaderboard-world-records"));
+	$('#leaderboard-world-records').append('\
+	<tr>\
+		<th>#</th>\
+		<th>Player</th>\
+		<th>Records</th>\
+	</tr>');
+	$.getJSON('http://kztimerglobal.com/api/v1.0/records/top/world_records?stages=0&mode_ids=' + GetModeID(GetRunMode()) + '&tickrates=128&has_teleports=' + GetRunType(), function (data)
+	{
+		$.each(data, function (index, value)
+		{
+			$('#leaderboard-world-records').append('\
+			<tr>\
+				<td>' + (index + 1) + '</td>\
+				<td>' + data[index].player_name + '</td>\
+				<td>' + data[index].count + '</td>\
+			</tr>');
+		});
+	});
+}
+
+// helper stuff and stuff
+
+function GetRunType()
+{
+	var runType = document.getElementById("tpRun-dropdown")
+	return runType.options[runType.selectedIndex].value
+}
+
+function GetRunMode()
+{
+	var mode = document.getElementById("mode-dropdown")
+	return mode.options[mode.selectedIndex].value
+}
+
+function GetRunTypePretty()
+{
+	var runType = document.getElementById("tpRun-dropdown")
+	return runType.options[runType.selectedIndex].text
+}
+
+function GetRunModePretty()
+{
+	var mode = document.getElementById("mode-dropdown")
+	return mode.options[mode.selectedIndex].text
+}
+
+function RemoveAllChildrenFromNode(node)
+{
+	while (node.lastChild)
+	{
+		node.removeChild(node.lastChild);
+	}
+	return node;
+}
+
+</script>
+
+
+</html>
