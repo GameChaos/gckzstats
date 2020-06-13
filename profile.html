@@ -1,0 +1,144 @@
+<!doctype html>
+
+<head>
+	<title>GCKZStats - Player profile</title>
+	<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+		integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+	<script src="js/helpers.js"></script>
+	<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body></body>
+<select onchange="OnTPRunDropdownChanged()" id="tpRun-dropdown" name="TP/Pro">
+	<option value="false">Pro</option>
+	<option value="true">TP</option>
+</select>
+
+<select onchange="OnModeDropdownChanged()" id="mode-dropdown" name="Mode">
+	<option value="kz_timer">KZTimer</option>
+	<option value="kz_simple">SimpleKZ</option>
+	<option value="kz_vanilla">Vanilla</option>
+</select>
+
+
+<!-- Player info -->
+<div id="player-info">
+	<h3 id="player-name">Unknown Player</h3>
+	STEAM_1:X:XXXXXXXXX<br>
+	<a href="https://steamcommunity.com/profiles/">Steam profile</a><br>
+</div>
+
+<div style="padding:0px 1% 0px 1%; float: left">
+	<h4>Point Leaderboard</h4>
+	<table id="personal-records" style="width:75%;">
+		<tr>
+			<th>Map</th>
+			<th>Points</th>
+			<th>Run time</th>
+			<th>Teleports</th>
+			<th>Date</th>
+			<th>Server</th>
+		</tr>
+	</table>
+</div>
+
+</body>
+
+<script>
+
+let g_SteamID = "STEAM_1:0:102468802"
+
+OnPageOpened()
+function OnPageOpened()
+{
+	let params = GetParams(window.location.href)
+	for (let key in params)
+	{
+		if (key == "steamid")
+		{
+			g_SteamID = params[key]
+			console.log(g_SteamID, typeof(g_SteamID))
+			break
+		}
+	}
+	
+	if ((typeof g_SteamID) !== "string")
+	{
+		// TODO: maybe fall back on some neutral steamid.
+		g_SteamID = "STEAM_1:0:102468802"
+	}
+	
+	console.log(g_SteamID, typeof(g_SteamID))
+	UpdatePlayerProfile(g_SteamID)
+}
+
+function OnTPRunDropdownChanged()
+{
+	UpdatePlayerProfile(g_SteamID)
+}
+
+function OnModeDropdownChanged()
+{
+	UpdatePlayerProfile(g_SteamID)
+}
+
+function UpdatePlayerProfile(steamID)
+{
+	RemoveAllChildrenFromNode(document.getElementById("personal-records"));
+	$('#personal-records').append('\
+	<tr>\
+		<th>Map</th>\
+		<th>Points</th>\
+		<th>Run time</th>\
+		<th>Teleports</th>\
+		<th>Date</th>\
+		<th>Server</th>\
+	</tr>')
+	// https://kztimerglobal.com/api/v2.0/records/top?steam_id=STEAM_1%3A0%3A102468802&tickrate=128&stage=0&modes_list=kz_timer&has_teleports=false
+	$.getJSON("https://kztimerglobal.com/api/v2.0/records/top?steam_id=" + steamID + "&tickrate=128&stage=0&modes_list=" + GetRunMode() + "&has_teleports=" + GetRunType() + "&limit=10000", function (data)
+	{
+		if (data.length == 0)
+		{
+			return
+		}
+		
+		RemoveAllChildrenFromNode(document.getElementById("player-info"));
+		$('#player-info').append('\
+			<h3 id="player-name">' + data[0].player_name + '</h3>\
+			' + data[0].steam_id + '<br>\
+			<a href="https://steamcommunity.com/profiles/' + data[0].steamid64 + '">Steam profile</a><br>'
+		)
+		
+		data.sort(function(a, b) {
+			let date1 = new Date(a.created_on)
+			let date2 = new Date(b.created_on)
+			return date2 - date1
+		})
+		
+		let dateOptions = {
+			year: "numeric",
+			month: "2-digit",
+			day: "2-digit",
+			hour: "2-digit",
+			minute: "2-digit",
+			second: "2-digit"
+		}
+		
+		$.each(data, function (index, value)
+		{
+			$('#personal-records').append('\
+			<tr>\
+				<td>' + data[index].map_name + '</td>\
+				<td>' + data[index].points + '</td>\
+				<td>' + FormatTime(data[index].time) + '</td>\
+				<td>' + data[index].teleports + '</td>\
+				<td>' + new Date(data[index].created_on).toLocaleDateString("en-GB",dateOptions) + '</td>\
+				<td>' + data[index].server_name + '</td>\
+			</tr>');
+		})
+	})
+}
+
+</script>
+
+</html>

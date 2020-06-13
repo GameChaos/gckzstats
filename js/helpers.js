@@ -1,3 +1,54 @@
+/**
+ * Get the URL parameters
+ * source: https://css-tricks.com/snippets/javascript/get-url-variables/
+ * @param  {String} url The URL
+ * @return {Object}     The URL parameters
+ */
+function GetParams(url)
+{
+	let params = {}
+	let parser = document.createElement("a")
+	parser.href = url
+	let query = parser.search.substring(1)
+	let vars = query.split('&')
+	for (let i = 0; i < vars.length; i++)
+	{
+		let pair = vars[i].split('=')
+		params[pair[0]] = decodeURIComponent(pair[1])
+	}
+	return params;
+};
+
+function FormatTime(fTime)
+{
+	var roundedTime = Math.floor(fTime)
+	var hours = Math.floor(roundedTime / 3600)
+	var minutes = Math.floor(roundedTime / 60 - hours * 60)
+	var seconds = Math.floor(roundedTime - hours * 3600 - minutes * 60)
+	var centiseconds = Math.floor((parseFloat(fTime) - roundedTime) * 100)
+
+	var timeString = ""
+	
+	function padTime(string, time)
+	{
+		if (time < 10)
+		{
+			string = `${string}0`
+		}
+		return string;
+	}
+	
+	if (hours != 0)
+	{
+		timeString += `${hours}:`
+	}
+	timeString += minutes < 10 ? `0${minutes}:` : `${minutes}:`
+	timeString += seconds < 10 ? `0${seconds}.` : `${seconds}.`
+	timeString += centiseconds < 10 ? `0${centiseconds}` : `${centiseconds}`
+
+	return timeString;
+}
+
 function GetModeID(modeString)
 {
 	switch (modeString) {
@@ -32,4 +83,38 @@ function GetModeName(modeID)
 			return -1;
 			break;
 	}
+}
+
+// only works if an element with that id exists with the correct footprint
+function GetRunType()
+{
+	var runType = document.getElementById("tpRun-dropdown")
+	return runType.options[runType.selectedIndex].value
+}
+
+function GetRunMode()
+{
+	var mode = document.getElementById("mode-dropdown")
+	return mode.options[mode.selectedIndex].value
+}
+
+function GetRunTypePretty()
+{
+	var runType = document.getElementById("tpRun-dropdown")
+	return runType.options[runType.selectedIndex].text
+}
+
+function GetRunModePretty()
+{
+	var mode = document.getElementById("mode-dropdown")
+	return mode.options[mode.selectedIndex].text
+}
+
+function RemoveAllChildrenFromNode(node)
+{
+	while (node.lastChild)
+	{
+		node.removeChild(node.lastChild);
+	}
+	return node;
 }

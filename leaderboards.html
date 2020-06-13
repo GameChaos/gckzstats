@@ -15,7 +15,7 @@ integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="ano
 </head>
 
 <body>
-	
+
 <select onchange="OnTPRunDropdownChanged()" id="tpRun-dropdown" name="TP/Pro">
 	<option value="false">Pro</option>
 	<option value="true">TP</option>
@@ -100,7 +100,7 @@ function UpdatePointLeaderboard()
 			$('#leaderboard-points').append('\
 			<tr>\
 				<td>' + (index + 1) + '</td>\
-				<td>' + data[index].player_name + '</td>\
+				<td><a href=' + "profile.html?steamid=" + data[index].steamid + ">" + data[index].player_name + "</a>" + '</td>\
 				<td>' + data[index].points.toLocaleString() + '</td>\
 				<td>' + data[index].average.toFixed(1) + '</td>\
 			</tr>');
@@ -125,48 +125,12 @@ function UpdateWorldRecordLeaderboard()
 			$('#leaderboard-world-records').append('\
 			<tr>\
 				<td>' + (index + 1) + '</td>\
-				<td>' + data[index].player_name + '</td>\
+				<td><a href=' + "profile.html?steamid=" + data[index].steam_id + ">" + data[index].player_name + "</a>" + '</td>\
 				<td>' + data[index].count + '</td>\
 			</tr>');
 		});
 	});
 }
-
-// helper stuff and stuff
-
-function GetRunType()
-{
-	var runType = document.getElementById("tpRun-dropdown")
-	return runType.options[runType.selectedIndex].value
-}
-
-function GetRunMode()
-{
-	var mode = document.getElementById("mode-dropdown")
-	return mode.options[mode.selectedIndex].value
-}
-
-function GetRunTypePretty()
-{
-	var runType = document.getElementById("tpRun-dropdown")
-	return runType.options[runType.selectedIndex].text
-}
-
-function GetRunModePretty()
-{
-	var mode = document.getElementById("mode-dropdown")
-	return mode.options[mode.selectedIndex].text
-}
-
-function RemoveAllChildrenFromNode(node)
-{
-	while (node.lastChild)
-	{
-		node.removeChild(node.lastChild);
-	}
-	return node;
-}
-
 </script>
 
 
