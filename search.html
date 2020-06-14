@@ -63,7 +63,7 @@ function OnPageOpened()
 function UpdateSearchResults(searchString)
 {
 	//http://kztimerglobal.com/api/v1.0/players?name=gamechaos
-	RemoveAllChildrenFromNode(document.getElementById("search-results-players"));
+	RemoveAllChildrenFromNode(document.getElementById("search-results-players"))
 	$('#search-results-players').append('\
 		<tr>\
 			<th>Name</th>\
@@ -83,13 +83,13 @@ function UpdateSearchResults(searchString)
 			<tr>\
 				<td><a href=' + "profile.html?steamid=" + data[index].steam_id + ">" + data[index].name + "</a>" + '</td>\
 				<td>' + data[index].steam_id + '</td>\
-			</tr>');
+			</tr>')
 		})
 	})
 	
 	// maps
 	//http://kztimerglobal.com/api/v2.0/maps?is_validated=true
-	RemoveAllChildrenFromNode(document.getElementById("search-results-maps"));
+	RemoveAllChildrenFromNode(document.getElementById("search-results-maps"))
 	$('#search-results-maps').append('\
 		<tr>\
 			<th>Maps</th>\
@@ -109,7 +109,7 @@ function UpdateSearchResults(searchString)
 				$('#search-results-maps').append('\
 				<tr>\
 					<td>' + data[index].name + '</td>\
-				</tr>');
+				</tr>')
 			}
 		})
 	})

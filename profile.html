@@ -82,7 +82,7 @@ function OnModeDropdownChanged()
 
 function UpdatePlayerProfile(steamID)
 {
-	RemoveAllChildrenFromNode(document.getElementById("personal-records"));
+	RemoveAllChildrenFromNode(document.getElementById("personal-records"))
 	$('#personal-records').append('\
 	<tr>\
 		<th>Map</th>\
@@ -100,7 +100,7 @@ function UpdatePlayerProfile(steamID)
 			return
 		}
 		
-		RemoveAllChildrenFromNode(document.getElementById("player-info"));
+		RemoveAllChildrenFromNode(document.getElementById("player-info"))
 		$('#player-info').append('\
 			<h3 id="player-name">' + data[0].player_name + '</h3>\
 			' + data[0].steam_id + '<br>\
@@ -132,7 +132,7 @@ function UpdatePlayerProfile(steamID)
 				<td>' + data[index].teleports + '</td>\
 				<td>' + new Date(data[index].created_on).toLocaleDateString("en-GB",dateOptions) + '</td>\
 				<td>' + data[index].server_name + '</td>\
-			</tr>');
+			</tr>')
 		})
 	})
 }

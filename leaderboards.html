@@ -84,14 +84,14 @@ function UpdateLeaderboardTitle()
 function UpdatePointLeaderboard()
 {
 	// https://kztimerglobal.com/api/v1.0/records/top/world_records?stages=0&mode_ids=200&has_teleports=false
-	RemoveAllChildrenFromNode(document.getElementById("leaderboard-points"));
+	RemoveAllChildrenFromNode(document.getElementById("leaderboard-points"))
 	$('#leaderboard-points').append('\
 	<tr>\
 		<th>#</th>\
 		<th>Player</th>\
 		<th>Total</th>\
 		<th>Average</th>\
-	</tr>');
+	</tr>')
 	// https://kztimerglobal.com/api/v1.0/player_ranks?stages=0&mode_ids=200&tickrates=128&has_teleports=false
 	$.getJSON('https://kztimerglobal.com/api/v1.0/player_ranks?stages=0&mode_ids=' + GetModeID(GetRunMode()) + '&tickrates=128&has_teleports=' + GetRunType(), function (data)
 	{
@@ -103,21 +103,21 @@ function UpdatePointLeaderboard()
 				<td><a href=' + "profile.html?steamid=" + data[index].steamid + ">" + data[index].player_name + "</a>" + '</td>\
 				<td>' + data[index].points.toLocaleString() + '</td>\
 				<td>' + data[index].average.toFixed(1) + '</td>\
-			</tr>');
-		});
-	});
+			</tr>')
+		})
+	})
 }
 
 function UpdateWorldRecordLeaderboard()
 {
 	// https://kztimerglobal.com/api/v1.0/records/top/world_records?stages=0&mode_ids=200&has_teleports=false
-	RemoveAllChildrenFromNode(document.getElementById("leaderboard-world-records"));
+	RemoveAllChildrenFromNode(document.getElementById("leaderboard-world-records"))
 	$('#leaderboard-world-records').append('\
 	<tr>\
 		<th>#</th>\
 		<th>Player</th>\
 		<th>Records</th>\
-	</tr>');
+	</tr>')
 	$.getJSON('https://kztimerglobal.com/api/v1.0/records/top/world_records?stages=0&mode_ids=' + GetModeID(GetRunMode()) + '&tickrates=128&has_teleports=' + GetRunType(), function (data)
 	{
 		$.each(data, function (index, value)
@@ -127,9 +127,9 @@ function UpdateWorldRecordLeaderboard()
 				<td>' + (index + 1) + '</td>\
 				<td><a href=' + "profile.html?steamid=" + data[index].steam_id + ">" + data[index].player_name + "</a>" + '</td>\
 				<td>' + data[index].count + '</td>\
-			</tr>');
-		});
-	});
+			</tr>')
+		})
+	})
 }
 </script>
 
