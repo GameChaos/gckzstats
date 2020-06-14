@@ -127,7 +127,7 @@ function UpdatePlayerProfile(steamID)
 			$('#personal-records').append('\
 			<tr>\
 				<td>' + data[index].map_name + '</td>\
-				<td>' + data[index].points + '</td>\
+				<td>' + ((data[index].points == "1000") ? (data[index].points + "(WR)") : (data[index].points)) + '</td>\
 				<td>' + FormatTime(data[index].time) + '</td>\
 				<td>' + data[index].teleports + '</td>\
 				<td>' + new Date(data[index].created_on).toLocaleDateString("en-GB",dateOptions) + '</td>\
