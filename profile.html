@@ -57,7 +57,6 @@ function OnPageOpened()
 		if (key == "steamid")
 		{
 			g_SteamID = params[key]
-			console.log(g_SteamID, typeof(g_SteamID))
 			break
 		}
 	}
@@ -68,7 +67,6 @@ function OnPageOpened()
 		g_SteamID = "STEAM_1:0:102468802"
 	}
 	
-	console.log(g_SteamID, typeof(g_SteamID))
 	UpdatePlayerProfile(g_SteamID)
 }
 

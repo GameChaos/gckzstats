@@ -1,0 +1,120 @@
+<!doctype html>
+
+<head>
+	<title>GCKZStats - Search</title>
+	<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+		integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+	<script src="js/helpers.js"></script>
+	<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<form action="./search.html" method="get">
+	<input name="search" type="text" id="search-input" placeholder="Map or player name">
+	<input type="submit" value="Search">
+</form>
+
+<h1>Search</h1>
+<div id="search-results">
+	<h2>Results</h2>
+	<div style="padding:0px 1% 0px 1%; float: left">
+		<h3>Players</h3>
+		<table id="search-results-players" style="width:75%;float: left;">
+			<tr>
+				<th>Name</th>
+				<th>Steam ID</th>
+			</tr>
+		</table>
+	</div>
+	<div style="padding:0px 1% 0px 1%; float: left">
+		<h3>Maps</h3>
+		<table id="search-results-maps" style="width:75%;float: left;">
+			<tr>
+				<th>Maps</th>
+			</tr>
+		</table>
+	</div>
+</div>
+</body>
+
+<script>
+
+let g_SearchString = ""
+OnPageOpened()
+function OnPageOpened()
+{
+	let params = GetParams(window.location.href)
+	if ("search" in params)
+	{
+		g_SearchString = params["search"]
+	}
+	
+	if (g_SearchString === "")
+	{
+		RemoveAllChildrenFromNode(document.getElementById("search-results"))
+	}
+	else
+	{
+		UpdateSearchResults(g_SearchString)
+	}
+}
+
+function UpdateSearchResults(searchString)
+{
+	//http://kztimerglobal.com/api/v1.0/players?name=gamechaos
+	RemoveAllChildrenFromNode(document.getElementById("search-results-players"));
+	$('#search-results-players').append('\
+		<tr>\
+			<th>Name</th>\
+			<th>Steam ID</th>\
+		</tr>'
+	)
+	$.getJSON("https://kztimerglobal.com/api/v1.0/players?name=" + searchString, function (data)
+	{
+		if (data.length == 0)
+		{
+			return
+		}
+		
+		$.each(data, function (index, value)
+		{
+			$('#search-results-players').append('\
+			<tr>\
+				<td><a href=' + "profile.html?steamid=" + data[index].steam_id + ">" + data[index].name + "</a>" + '</td>\
+				<td>' + data[index].steam_id + '</td>\
+			</tr>');
+		})
+	})
+	
+	// maps
+	//http://kztimerglobal.com/api/v2.0/maps?is_validated=true
+	RemoveAllChildrenFromNode(document.getElementById("search-results-maps"));
+	$('#search-results-maps').append('\
+		<tr>\
+			<th>Maps</th>\
+		</tr>'
+	)
+	$.getJSON("http://kztimerglobal.com/api/v2.0/maps?is_validated=true", function (data)
+	{
+		if (data.length == 0)
+		{
+			return
+		}
+		
+		$.each(data, function (index, value)
+		{
+			if (data[index].name.indexOf(searchString) !== -1)
+			{
+				$('#search-results-maps').append('\
+				<tr>\
+					<td>' + data[index].name + '</td>\
+				</tr>');
+			}
+		})
+	})
+}
+
+</script>
+
+</html>
