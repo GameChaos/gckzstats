@@ -108,7 +108,7 @@ function UpdateMaptop(mapName, stage)
 	
 	// need to do a second api call for other run type wr (tp/pro)
 	$.getJSON("https://kztimerglobal.com/api/v1.0/records/top?map_name="
-		+ mapName + "&tickrate=128&stage=" + stage + "&modes_list=" + GetRunMode() + "&has_teleports=" + (GetRunType() == "true" ? "false" : "true") + "&limit=100", function (data)
+		+ mapName + "&tickrate=128&stage=" + stage + "&modes_list=" + GetRunMode() + "&has_teleports=" + (GetRunType() == "true" ? "false" : "true") + "&limit=1", function (data)
 	{
 		if (GetRunType() == "true")
 		{
