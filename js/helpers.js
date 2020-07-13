@@ -126,6 +126,13 @@ function CreatePlayerProfileLink(steamID, playerName)
 	return "<a href=profile.html?steamid=" + steamID + ">" + playerName + "</a>"
 }
 
+// creates a html string that contains a hyperlink to maptop.html with the map's name.
+// example: "<a href=maptop.html?mapname=kz_beginnerblock_go>kz_beginnerblock_go</a>"
+function CreateMaptopLink(mapname)
+{
+	return "<a href=maptop.html?mapname=" + mapname + ">" + mapname + "</a>"
+}
+
 let g_DateOptions = {
 	year: "numeric",
 	month: "2-digit",
