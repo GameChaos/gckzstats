@@ -100,7 +100,7 @@ function UpdatePointLeaderboard()
 			$('#leaderboard-points').append('\
 			<tr>\
 				<td>' + (index + 1) + '</td>\
-				<td><a href=' + "profile.html?steamid=" + data[index].steamid + ">" + data[index].player_name + "</a>" + '</td>\
+				<td>' + CreatePlayerProfileLink(data[index].steamid, data[index].player_name) + '</td>\
 				<td>' + data[index].points.toLocaleString() + '</td>\
 				<td>' + data[index].average.toFixed(1) + '</td>\
 			</tr>')

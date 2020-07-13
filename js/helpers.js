@@ -125,3 +125,12 @@ function CreatePlayerProfileLink(steamID, playerName)
 {
 	return "<a href=profile.html?steamid=" + steamID + ">" + playerName + "</a>"
 }
+
+let g_DateOptions = {
+	year: "numeric",
+	month: "2-digit",
+	day: "2-digit",
+	hour: "2-digit",
+	minute: "2-digit",
+	second: "2-digit"
+}
