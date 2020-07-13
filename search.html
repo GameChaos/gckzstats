@@ -62,7 +62,7 @@ function OnPageOpened()
 
 function UpdateSearchResults(searchString)
 {
-	//http://kztimerglobal.com/api/v1.0/players?name=gamechaos
+	//https://kztimerglobal.com/api/v1.0/players?name=gamechaos
 	RemoveAllChildrenFromNode(document.getElementById("search-results-players"))
 	$('#search-results-players').append('\
 		<tr>\
@@ -88,14 +88,14 @@ function UpdateSearchResults(searchString)
 	})
 	
 	// maps
-	//http://kztimerglobal.com/api/v2.0/maps?is_validated=true
+	//https://kztimerglobal.com/api/v2.0/maps?is_validated=true
 	RemoveAllChildrenFromNode(document.getElementById("search-results-maps"))
 	$('#search-results-maps').append('\
 		<tr>\
 			<th>Maps</th>\
 		</tr>'
 	)
-	$.getJSON("http://kztimerglobal.com/api/v2.0/maps?is_validated=true", function (data)
+	$.getJSON("https://kztimerglobal.com/api/v2.0/maps?is_validated=true", function (data)
 	{
 		if (data.length == 0)
 		{
