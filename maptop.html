@@ -92,12 +92,6 @@ function UpdateMaptop(mapName, stage)
 			$('#pro-wr-info').text(data[0].time + ' by ' + data[0].player_name)
 		}
 		
-		/*data.sort(function(a, b) {
-			let date1 = new Date(a.created_on)
-			let date2 = new Date(b.created_on)
-			return date2 - date1
-		})*/
-		
 		$.each(data, function (index, value)
 		{
 			$('#leaderboard').append('\
