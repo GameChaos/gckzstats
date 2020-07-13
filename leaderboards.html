@@ -125,7 +125,7 @@ function UpdateWorldRecordLeaderboard()
 			$('#leaderboard-world-records').append('\
 			<tr>\
 				<td>' + (index + 1) + '</td>\
-				<td><a href=' + "profile.html?steamid=" + data[index].steam_id + ">" + data[index].player_name + "</a>" + '</td>\
+				<td>' + CreatePlayerProfileLink(data[index].steam_id, data[index].player_name) + '</td>\
 				<td>' + data[index].count + '</td>\
 			</tr>')
 		})

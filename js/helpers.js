@@ -118,3 +118,10 @@ function RemoveAllChildrenFromNode(node)
 	}
 	return node;
 }
+
+// creates a html string that contains a hyperlink to profile.html with the player's steam id.
+// example: "<a href=profile.html?steamid=STEAM_1:0:102468802>GameChaos</a>"
+function CreatePlayerProfileLink(steamID, playerName)
+{
+	return "<a href=profile.html?steamid=" + steamID + ">" + playerName + "</a>"
+}

@@ -81,7 +81,7 @@ function UpdateSearchResults(searchString)
 		{
 			$('#search-results-players').append('\
 			<tr>\
-				<td><a href=' + "profile.html?steamid=" + data[index].steam_id + ">" + data[index].name + "</a>" + '</td>\
+				<td>' + CreatePlayerProfileLink(data[index].steam_id, data[index].name) + '</td>\
 				<td>' + data[index].steam_id + '</td>\
 			</tr>')
 		})
