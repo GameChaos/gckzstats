@@ -1,0 +1,158 @@
+<!doctype html>
+
+<head>
+	<title>GCKZStats - Maptop</title>
+	<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+		integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+	<script src="js/helpers.js"></script>
+	<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+<!-- TODO: make this stuff into a function so it isn't repeated all over the place or something -->
+<select onchange="OnTPRunDropdownChanged()" id="tpRun-dropdown" name="TP/Pro">
+	<option value="false">Pro</option>
+	<option value="true">TP</option>
+</select>
+
+<select onchange="OnModeDropdownChanged()" id="mode-dropdown" name="Mode">
+	<option value="kz_timer">KZTimer</option>
+	<option value="kz_simple">SimpleKZ</option>
+	<option value="kz_vanilla">Vanilla</option>
+</select>
+
+<div id="map-info">
+	<h1 id="map-name">---</h1>
+	<nobr><b>Pro WR: </b><span id="pro-wr-info">00:00:00 by Unknown Player</span></nobr>
+	<br>
+	<nobr><b>TP WR: </b><span id="tp-wr-info">00:00:00 by Unknown Player</span></nobr>
+</div>
+
+<br>
+
+<div style="padding:0px 1% 0px 1%; float: left">
+	<table id="leaderboard" style="width:75%;">
+		<tr>
+			<th>Place</th>
+			<th>Name</th>
+			<th>Run time</th>
+			<th>Teleports</th>
+			<th>Date</th>
+			<th>Server</th>
+		</tr>
+	</table>
+</div>
+
+</body>
+
+<script>
+
+g_MapName = ""
+
+function OnTPRunDropdownChanged()
+{
+	UpdateMaptop(g_MapName, 0)
+}
+
+function OnModeDropdownChanged()
+{
+	UpdateMaptop(g_MapName, 0)
+}
+
+function UpdateMaptop(mapName, stage)
+{
+	RemoveAllChildrenFromNode(document.getElementById("leaderboard"))
+	$('#leaderboard').append('\
+	<tr>\
+		<th>Place</th>\
+		<th>Name</th>\
+		<th>Run time</th>\
+		<th>Teleports</th>\
+		<th>Date</th>\
+		<th>Server</th>\
+	</tr>')
+	
+	$.getJSON("http://kztimerglobal.com/api/v1.0/records/top?map_name="
+		+ mapName + "&tickrate=128&stage=" + stage + "&modes_list=" + GetRunMode() + "&has_teleports=" + GetRunType() + "&limit=100", function (data)
+	{
+		if (data.length == 0)
+		{
+			return
+		}
+		
+		// if run is tp ((lol))
+		if (GetRunType() == "true")
+		{
+			RemoveAllChildrenFromNode(document.getElementById("tp-wr-info"))
+			$('#tp-wr-info').text(data[0].time + ' by ' + data[0].player_name)
+		}
+		else
+		{
+			RemoveAllChildrenFromNode(document.getElementById("pro-wr-info"))
+			$('#pro-wr-info').text(data[0].time + ' by ' + data[0].player_name)
+		}
+		
+		/*data.sort(function(a, b) {
+			let date1 = new Date(a.created_on)
+			let date2 = new Date(b.created_on)
+			return date2 - date1
+		})*/
+		
+		$.each(data, function (index, value)
+		{
+			$('#leaderboard').append('\
+			<tr>\
+				<td>' + (index + 1) + '</td>\
+				<td>' + CreatePlayerProfileLink(data[index].steam_id, data[index].player_name) + '</td>\
+				<td>' + FormatTime(data[index].time) + '</td>\
+				<td>' + data[index].teleports + '</td>\
+				<td>' + new Date(data[index].created_on).toLocaleDateString("en-GB", g_DateOptions) + '</td>\
+				<td>' + data[index].server_name + '</td>\
+			</tr>')
+		})
+	})
+	
+	// need to do a second api call for other run type wr (tp/pro)
+	$.getJSON("http://kztimerglobal.com/api/v1.0/records/top?map_name="
+		+ mapName + "&tickrate=128&stage=" + stage + "&modes_list=" + GetRunMode() + "&has_teleports=" + (GetRunType() == "true" ? "false" : "true") + "&limit=100", function (data)
+	{
+		if (GetRunType() == "true")
+		{
+			// if the run type we originally wanted is tp, then update pro wr info
+			RemoveAllChildrenFromNode(document.getElementById("pro-wr-info"))
+			$('#pro-wr-info').text(data[0].time + ' by ' + data[0].player_name)
+		}
+		else
+		{
+			RemoveAllChildrenFromNode(document.getElementById("tp-wr-info"))
+			$('#tp-wr-info').text(data[0].time + ' by ' + data[0].player_name)
+		}
+	})
+}
+
+function OnPageOpened()
+{
+	let params = GetParams(window.location.href)
+	for (let key in params)
+	{
+		if (key == "mapname")
+		{
+			g_MapName = params[key]
+			break
+		}
+	}
+	$('#map-name').text(g_MapName)
+	
+	if ((typeof g_MapName) !== "string")
+	{
+		// TODO: maybe fall back on some other map or something else idk.
+		g_MapName = kz_beginnerblock_go
+	}
+	
+	UpdateMaptop(g_MapName, 0)
+}
+OnPageOpened()
+
+</script>
+
+</html>
