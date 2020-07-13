@@ -114,12 +114,12 @@ function UpdateMaptop(mapName, stage)
 		{
 			// if the run type we originally wanted is tp, then update pro wr info
 			RemoveAllChildrenFromNode(document.getElementById("pro-wr-info"))
-			$('#pro-wr-info').text(data[0].time + ' by ' + data[0].player_name)
+			$('#pro-wr-info').text(data[0].time + ' by ' + CreatePlayerProfileLink(data[index].steam_id, data[0].player_name))
 		}
 		else
 		{
 			RemoveAllChildrenFromNode(document.getElementById("tp-wr-info"))
-			$('#tp-wr-info').text(data[0].time + ' by ' + data[0].player_name)
+			$('#tp-wr-info').text(data[0].time + ' by ' + CreatePlayerProfileLink(data[index].steam_id, data[0].player_name))
 		}
 	})
 }
